@@ -2,7 +2,8 @@
 Tic Tac Toe Player
 """
 
-import math, copy
+import math
+import copy
 
 X = "X"
 O = "O"
@@ -29,26 +30,24 @@ def player(board):
 
     # X always goes first, so the turn alternates based on counts
     return 'X' if x_count == o_count else 'O'
+    
 
 def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    #raise NotImplementedError
     possibleAction = set()
-    for i in range(len(board)) :
+    for i in range(len(board)):
         for j in range(len(board[i])):
-            if  board[i][j] == EMPTY:
-                possibleAction.add(i, j)
+            if board[i][j] == EMPTY:
+                possibleAction.add((i, j))
     return possibleAction
-
 
 
 def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    #raise NotImplementedError
     deep_board = copy.deepcopy(board)
     # Validate the action
     if action not in actions(board):
@@ -64,12 +63,10 @@ def result(board, action):
     return deep_board
 
 
-
 def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    #raise NotImplementedError
     # Check horizontal wins
     for row in board:
         if row.count(row[0]) == len(row) and row[0] != EMPTY:
@@ -101,20 +98,97 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    #raise NotImplementedError
-    
-    return winner(board) or all(cell != EMPTY for row in board for cell in row)
-    
+    # Check if there is a winner
+    if winner(board):
+        return True
+
+    # Check if all cells have been filled
+    for row in board:
+        for cell in row:
+            if cell == EMPTY:
+                return False  # Game is not over if there are empty cells
+
+    # If no winner and all cells are filled, game is over
+    return True
+
 
 def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    raise NotImplementedError
+    if (winner(board) == 'X'):
+        return 1
+    elif (winner(board) == 'O'):
+        return -1
+    return 0
 
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    # Check if the board is terminal
+    if terminal(board):
+        return None
+
+    # Get the current player
+    current_player = 'X' if player(board) == 'X' else 'O'
+
+    # Initialize the best score and action
+    if current_player == 'X':
+        best_score = -float('inf')
+    else:
+        best_score = float('inf')
+    best_action = None
+
+    # Iterate over all possible actions
+    for action in actions(board):
+        # Simulate the move
+        new_board = result(board, action)
+
+        # Recursively call the minimax function
+        score = minimax_value(new_board)
+
+        # Update the best score and action
+        if current_player == 'X' and score > best_score:
+            best_score = score
+            best_action = action
+        elif current_player == 'O' and score < best_score:
+            best_score = score
+            best_action = action
+
+    return best_action
+
+
+def minimax_value(board):
+    """
+    Returns the value of the board.
+    """
+    # Check if the board is terminal
+    if terminal(board):
+        return utility(board)
+
+    # Get the current player
+    current_player = 'X' if player(board) == 'X' else 'O'
+
+    # Initialize the best score
+    if current_player == 'X':
+        best_score = -float('inf')
+    else:
+        best_score = float('inf')
+
+    # Iterate over all possible actions
+    for action in actions(board):
+        # Simulate the move
+        new_board = result(board, action)
+
+        # Recursively call the minimax_value function
+        score = minimax_value(new_board)
+
+        # Update the best score
+        if current_player == 'X' and score > best_score:
+            best_score = score
+        elif current_player == 'O' and score < best_score:
+            best_score = score
+
+    return best_score
