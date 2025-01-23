@@ -69,15 +69,42 @@ def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    raise NotImplementedError
+    #raise NotImplementedError
+    # Check horizontal wins
+    for row in board:
+        if row.count(row[0]) == len(row) and row[0] != EMPTY:
+            return row[0]
+
+    # Check vertical wins
+    for col in range(len(board[0])):
+        check = []
+        for row in board:
+            check.append(row[col])
+        if check.count(check[0]) == len(check) and check[0] != EMPTY:
+            return check[0]
+
+    # Check diagonal wins (top-left to bottom-right)
+    diagonal1 = [board[i][i] for i in range(len(board))]
+    if diagonal1.count(diagonal1[0]) == len(diagonal1) and diagonal1[0] != EMPTY:
+        return diagonal1[0]
+
+    # Check diagonal wins (top-right to bottom-left)
+    diagonal2 = [board[i][len(board) - i - 1] for i in range(len(board))]
+    if diagonal2.count(diagonal2[0]) == len(diagonal2) and diagonal2[0] != EMPTY:
+        return diagonal2[0]
+
+    # If no winner, return None
+    return None
 
 
 def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    raise NotImplementedError
-
+    #raise NotImplementedError
+    
+    return winner(board) or all(cell != EMPTY for row in board for cell in row)
+    
 
 def utility(board):
     """
